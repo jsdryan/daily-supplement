@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Justin 補充劑時間表</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0; --card: #FFFFFF;
+    --text: #1A1A1A; --text-2: #666660; --text-3: #999993;
+    --border: rgba(0,0,0,0.08);
+    --blue: #1A5FBF; --blue-bg: #EAF0FB;
+    --green: #1A7A4A; --green-bg: #E8F5EE;
+    --amber: #8A5A00; --amber-bg: #FFF3D6;
+    --purple: #5A3AB7; --purple-bg: #F0ECFD;
+    --teal: #0A6E5A; --teal-bg: #E0F5EF;
+    --coral: #8A3020; --coral-bg: #FDEEE8;
+    --gray: #555550; --gray-bg: #F0EFE8;
+    --check: #1A7A4A;
+    --radius: 12px; --radius-sm: 8px;
+    --header-bg: #1A1A1A;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121212; --card: #1E1E1E;
+      --text: #E8E8E8; --text-2: #A0A0A0; --text-3: #707070;
+      --border: rgba(255,255,255,0.1);
+      --blue: #5B9BF0; --blue-bg: #1A2A40;
+      --green: #4ADE80; --green-bg: #122A1E;
+      --amber: #D4A017; --amber-bg: #2A2210;
+      --purple: #9B7BF0; --purple-bg: #1E1638;
+      --teal: #38D9A9; --teal-bg: #0D2A22;
+      --coral: #E07060; --coral-bg: #2A1510;
+      --gray: #A0A0A0; --gray-bg: #252525;
+      --check: #4ADE80;
+      --header-bg: #0A0A0A;
+    }
+  }
+  [data-theme="dark"] {
+    --bg: #121212; --card: #1E1E1E;
+    --text: #E8E8E8; --text-2: #A0A0A0; --text-3: #707070;
+    --border: rgba(255,255,255,0.1);
+    --blue: #5B9BF0; --blue-bg: #1A2A40;
+    --green: #4ADE80; --green-bg: #122A1E;
+    --amber: #D4A017; --amber-bg: #2A2210;
+    --purple: #9B7BF0; --purple-bg: #1E1638;
+    --teal: #38D9A9; --teal-bg: #0D2A22;
+    --coral: #E07060; --coral-bg: #2A1510;
+    --gray: #A0A0A0; --gray-bg: #252525;
+    --check: #4ADE80;
+    --header-bg: #0A0A0A;
+  }
+
+  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+
+  header { background: var(--header-bg); color: white; padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+  header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  header .date { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  .progress-wrap { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background 0.3s; width: 0%; }
+  .progress-text { font-size: 11px; color: rgba(255,255,255,0.55); min-width: 36px; text-align: right; }
+
+  .theme-btn { background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: rgba(255,255,255,0.6); font-size: 16px; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .theme-btn:active { background: rgba(255,255,255,0.1); }
+
+  .tabs { display: flex; background: var(--bg); position: sticky; top: 84px; z-index: 90; border-bottom: 1px solid var(--border); transition: background 0.3s; }
+  .tab { flex: 1; text-align: center; padding: 11px 4px; font-size: 13px; font-weight: 500; color: var(--text-3); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-family: 'Noto Sans TC', sans-serif; }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
+  .tab:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+  .page-label { font-size: 11px; font-weight: 700; color: var(--text-3); letter-spacing: 0.8px; margin-bottom: 12px; margin-top: 2px; }
+
+  .done-banner { display: none; background: var(--green-bg); border: 1px solid var(--check); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; font-weight: 500; color: var(--check); text-align: center; margin-bottom: 12px; }
+  .done-banner.show { display: block; animation: popIn 0.3s ease; }
+
+  @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes checkBounce { 0% { transform: scale(1); } 40% { transform: scale(1.25); } 100% { transform: scale(1); } }
+
+  .section { margin-bottom: 18px; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding: 9px 14px; background: var(--card); border-radius: var(--radius-sm); border: 1px solid var(--border); transition: background 0.3s; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .section-title { font-size: 13px; font-weight: 700; flex: 1; }
+  .section-count { font-size: 11px; color: var(--text-3); }
+
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 5px; cursor: pointer; transition: background 0.15s, opacity 0.15s; -webkit-tap-highlight-color: transparent; user-select: none; }
+  .item:last-child { margin-bottom: 0; }
+  .item:active { background: var(--bg); }
+  .item:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+  .item.checked { background: var(--green-bg); border-color: var(--check); opacity: 0.72; }
+  .item.checked .checkbox { animation: checkBounce 0.25s ease; }
+
+  .checkbox { width: 22px; height: 22px; border: 2px solid var(--text-3); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; background: var(--card); }
+  .item.checked .checkbox { background: var(--check); border-color: var(--check); }
+
+  .check-icon { display: none; width: 12px; height: 9px; position: relative; }
+  .check-icon::after { content: ''; position: absolute; left: 1px; top: 1px; width: 10px; height: 7px; border-left: 2.5px solid white; border-bottom: 2.5px solid white; transform: rotate(-45deg); }
+  .item.checked .check-icon { display: block; }
+
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; min-width: 66px; text-align: center; flex-shrink: 0; }
+  .pill-blue   { background: var(--blue-bg);   color: var(--blue); }
+  .pill-green  { background: var(--green-bg);  color: var(--green); }
+  .pill-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .pill-purple { background: var(--purple-bg); color: var(--purple); }
+  .pill-teal   { background: var(--teal-bg);   color: var(--teal); }
+  .pill-coral  { background: var(--coral-bg);  color: var(--coral); }
+  .pill-gray   { background: var(--gray-bg);   color: var(--gray); }
+
+  .item-body { flex: 1; }
+  .item-name { font-size: 13px; font-weight: 500; line-height: 1.4; }
+  .item-note { font-size: 12px; color: var(--text-2); margin-top: 3px; line-height: 1.5; }
+  .item.checked .item-name { text-decoration: line-through; color: var(--text-3); }
+  .item.checked .item-note { opacity: 0.55; }
+
+  .note-box { background: var(--gray-bg); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--text-2); margin-top: 8px; line-height: 1.6; transition: background 0.3s; }
+
+  .reset-btn { width: 100%; margin-top: 16px; padding: 13px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--text-2); cursor: pointer; font-family: 'Noto Sans TC', sans-serif; transition: background 0.15s; }
+  .reset-btn:active { background: var(--bg); }
+  .reset-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+
+  .summary-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 14px; margin-bottom: 12px; transition: background 0.3s; }
+  .sum-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+  .sum-row:last-child { border-bottom: none; }
+  .sum-info { flex: 1; }
+  .sum-name { font-size: 13px; font-weight: 600; }
+  .sum-detail { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.5; }
+  .badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .badge-daily { background: var(--green-bg); color: var(--green); }
+  .badge-train { background: var(--blue-bg); color: var(--blue); }
+  .badge-opt   { background: var(--gray-bg); color: var(--gray); }
+
+  .rules-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; transition: background 0.3s; }
+  .rules-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .rule-row { display: flex; gap: 10px; padding: 8px 0; font-size: 13px; line-height: 1.5; border-bottom: 1px solid var(--border); }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .rule-text { color: var(--text-2); }
+  .rule-text strong { color: var(--text); }
+
+  .streak-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--amber-bg); border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--amber); }
+  .streak-bar .streak-num { font-size: 18px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div>
+      <h1>Justin 補充劑時間表</h1>
+      <div class="date" id="today-date"></div>
+    </div>
+    <button class="theme-btn" id="theme-toggle" aria-label="切換深色模式" title="切換深色模式"></button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-text" id="progress-text"></div>
+  </div>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" role="tab" aria-selected="true" aria-controls="train" id="tab-train" onclick="showTab('train',this)" tabindex="0">訓練日</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="rest" id="tab-rest" onclick="showTab('rest',this)" tabindex="-1">休息日</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="summary" id="tab-summary" onclick="showTab('summary',this)" tabindex="-1">總覽</button>
+</div>
+
+<!-- 訓練日 -->
+<div id="train" class="page active" role="tabpanel" aria-labelledby="tab-train">
+  <div class="page-label">週一 二 三 五 六</div>
+  <div id="train-streak" class="streak-bar" style="display:none;"></div>
+  <div id="train-done" class="done-banner">今日補充劑全部完成 ✓</div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#1A5FBF;"></div><span class="section-title">早餐時</span><span class="section-count">4 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div><div class="item-note">早午晚各一，共 3 顆／天</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">空腹吃容易魚腥打嗝</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">隨餐吸收率較高</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-coral">瑪卡</span><div class="item-body"><div class="item-name">1–2 顆，隨餐</div><div class="item-note">早上吃，避免影響睡眠</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#BA7517;"></div><span class="section-title">午餐時</span><span class="section-count">1 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#534AB7;"></div><span class="section-title">晚餐時</span><span class="section-count">3 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div><div class="item-note">今日第 3 顆</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">早晚各一，共 2 顆</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">早晚各一，共 2 顆</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#1A7A4A;"></div><span class="section-title">晚餐後 30 分鐘（訓練前）</span><span class="section-count">3 項，同一杯</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-teal">乳清蛋白</span><div class="item-body"><div class="item-name">1 份，加水 300ml 搖勻</div><div class="item-note">其他粉末全加進這一杯</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">肌酸</span><div class="item-body"><div class="item-name">5g（1 平匙）加進乳清</div><div class="item-note">一起搖勻喝下</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">L-瓜胺酸</span><div class="item-body"><div class="item-name">3–5g 加進乳清</div><div class="item-note">或改吃 L-Arginine 1 顆，擇一</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#993C1D;"></div><span class="section-title">訓練後 30 分鐘內</span><span class="section-count">1 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-teal">乳清蛋白</span><div class="item-body"><div class="item-name">1 份，加水搖勻</div><div class="item-note">這杯只喝乳清，不用加其他粉末</div></div></div>
+  </div>
+
+  <div class="note-box">喝水目標 3,000ml 以上 — 肌酸和瓜胺酸需要足夠水分才能發揮效果</div>
+  <button class="reset-btn" onclick="resetPage('train')">重設今日打勾</button>
+</div>
+
+<!-- 休息日 -->
+<div id="rest" class="page" role="tabpanel" aria-labelledby="tab-rest">
+  <div class="page-label">週四 日</div>
+  <div id="rest-streak" class="streak-bar" style="display:none;"></div>
+  <div id="rest-done" class="done-banner">今日補充劑全部完成 ✓</div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#1A5FBF;"></div><span class="section-title">早餐時</span><span class="section-count">5 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-coral">瑪卡</span><div class="item-body"><div class="item-name">1–2 顆，隨餐</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">肌酸</span><div class="item-body"><div class="item-name">5g 加進早餐飲品或乳清</div><div class="item-note">休息日也要吃，維持肌肉內濃度</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#BA7517;"></div><span class="section-title">午餐時</span><span class="section-count">1 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="dot" style="background:#534AB7;"></div><span class="section-title">晚餐時</span><span class="section-count">3 項</span></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">今日第 3 顆</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
+  </div>
+
+  <div class="note-box">休息日不需要 L-瓜胺酸和 L-Arginine，其餘全部照常。喝水 2,500ml</div>
+  <button class="reset-btn" onclick="resetPage('rest')">重設今日打勾</button>
+</div>
+
+<!-- 總覽 -->
+<div id="summary" class="page" role="tabpanel" aria-labelledby="tab-summary">
+  <div class="summary-card">
+    <div class="sum-row"><span class="pill pill-blue" style="min-width:70px;text-align:center;">Opti-Men</span><div class="sum-info"><div class="sum-name">綜合維生素</div><div class="sum-detail">早午晚各 1 顆，共 3 顆 · 一定隨餐</div></div><span class="badge badge-daily">每天</span></div>
+    <div class="sum-row"><span class="pill pill-green" style="min-width:70px;text-align:center;">魚油</span><div class="sum-info"><div class="sum-name">Omega-3 高濃縮</div><div class="sum-detail">早晚各 1 顆，共 2 顆 · 隨餐</div></div><span class="badge badge-daily">每天</span></div>
+    <div class="sum-row"><span class="pill pill-purple" style="min-width:70px;text-align:center;">卵磷脂</span><div class="sum-info"><div class="sum-name">葵花卵磷脂 1,200mg</div><div class="sum-detail">早晚各 1 顆，共 2 顆 · 隨餐</div></div><span class="badge badge-daily">每天</span></div>
+    <div class="sum-row"><span class="pill pill-coral" style="min-width:70px;text-align:center;">瑪卡</span><div class="sum-info"><div class="sum-name">Raw Maca 750mg</div><div class="sum-detail">早餐 1–2 顆 · 避免下午後吃</div></div><span class="badge badge-daily">每天</span></div>
+    <div class="sum-row"><span class="pill pill-amber" style="min-width:70px;text-align:center;">肌酸</span><div class="sum-info"><div class="sum-name">Creatine Monohydrate</div><div class="sum-detail">每天 5g · 訓練日加訓練前乳清；休息日加早餐</div></div><span class="badge badge-daily">每天</span></div>
+    <div class="sum-row"><span class="pill pill-teal" style="min-width:70px;text-align:center;">乳清蛋白</span><div class="sum-info"><div class="sum-name">Whey Protein</div><div class="sum-detail">晚餐後 30 分（訓練前）+ 訓練後各 1 份</div></div><span class="badge badge-opt">依需求</span></div>
+    <div class="sum-row"><span class="pill pill-amber" style="min-width:70px;text-align:center;">L-瓜胺酸</span><div class="sum-info"><div class="sum-name">L-Citrulline 3–5g</div><div class="sum-detail">訓練前乳清裡 · 與 L-Arginine 擇一</div></div><span class="badge badge-train">訓練日</span></div>
+    <div class="sum-row"><span class="pill pill-gray" style="min-width:70px;text-align:center;">L-精胺酸</span><div class="sum-info"><div class="sum-name">L-Arginine 1,000mg</div><div class="sum-detail">懶得量粉末時取代瓜胺酸，擇一即可</div></div><span class="badge badge-opt">訓練日備用</span></div>
+  </div>
+
+  <div class="rules-card">
+    <div class="rules-title">重要原則</div>
+    <div class="rule-row"><span class="rule-icon">💊</span><span class="rule-text"><strong>Opti-Men、魚油、卵磷脂</strong> 一定要跟食物一起吃，空腹吃容易不舒服</span></div>
+    <div class="rule-row"><span class="rule-icon">⚡</span><span class="rule-text"><strong>肌酸不能跳過休息日</strong>，濃度穩定才有效，斷斷續續效果打折</span></div>
+    <div class="rule-row"><span class="rule-icon">🌅</span><span class="rule-text"><strong>瑪卡固定早餐吃</strong>，下午後吃少數人會睡不著</span></div>
+    <div class="rule-row"><span class="rule-icon">🏋️</span><span class="rule-text"><strong>訓練前乳清</strong>在晚餐後 30 分喝，訓練後 30 分內再補一杯</span></div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px;padding-bottom:8px;">
+    <p style="font-size:11px;color:var(--text-3);">Justin · 2026.03</p>
+  </div>
+</div>
+
+<script>
+  // ── Helpers ──
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function isTrainingDay() {
+    const day = new Date().getDay(); // 0=Sun
+    return [1,2,3,5,6].includes(day); // Mon,Tue,Wed,Fri,Sat
+  }
+
+  // ── Date Display ──
+  function updateDate() {
+    const d = new Date();
+    const days = ['日','一','二','三','四','五','六'];
+    const type = isTrainingDay() ? '訓練日' : '休息日';
+    document.getElementById('today-date').textContent =
+      d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日　週' + days[d.getDay()] + '（' + type + '）';
+  }
+
+  // ── Progress ──
+  function getProgressColor(pct) {
+    if (pct < 40) return '#FBBF24';
+    if (pct < 75) return '#34D399';
+    return '#4ADE80';
+  }
+
+  function updateProgress() {
+    const active = document.querySelector('.page.active');
+    const fill = document.getElementById('progress-fill');
+    const text = document.getElementById('progress-text');
+    if (!active || active.id === 'summary') {
+      fill.style.width = '0%';
+      fill.style.background = '#4ADE80';
+      text.textContent = '';
+      return;
+    }
+    const id = active.id;
+    const all = active.querySelectorAll('.item');
+    const done = active.querySelectorAll('.item.checked').length;
+    const total = all.length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    fill.style.width = pct + '%';
+    fill.style.background = getProgressColor(pct);
+    text.textContent = done + ' / ' + total;
+    const banner = document.getElementById(id + '-done');
+    if (banner) banner.classList.toggle('show', done === total && total > 0);
+  }
+
+  // ── Toggle & Keyboard ──
+  function toggle(el, page) {
+    const isChecked = el.classList.toggle('checked');
+    el.setAttribute('aria-checked', isChecked);
+    saveState(page);
+    updateProgress();
+  }
+
+  function handleKey(e, el, page) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle(el, page);
+    }
+  }
+
+  // ── Reset ──
+  function resetPage(page) {
+    document.querySelectorAll('#' + page + ' .item').forEach(el => {
+      el.classList.remove('checked');
+      el.setAttribute('aria-checked', 'false');
+    });
+    const b = document.getElementById(page + '-done');
+    if (b) b.classList.remove('show');
+    saveState(page);
+    updateProgress();
+  }
+
+  // ── Tabs ──
+  function showTab(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-selected', 'false');
+      b.tabIndex = -1;
+    });
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    btn.setAttribute('aria-selected', 'true');
+    btn.tabIndex = 0;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateProgress();
+  }
+
+  // ── LocalStorage Persistence ──
+  function storageKey(page) {
+    return 'supp_' + page + '_' + todayStr();
+  }
+
+  function saveState(page) {
+    const items = document.querySelectorAll('#' + page + ' .item');
+    const state = [];
+    items.forEach(el => state.push(el.classList.contains('checked')));
+    localStorage.setItem(storageKey(page), JSON.stringify(state));
+    // Record completion for streak
+    const done = state.filter(Boolean).length;
+    if (done === state.length && state.length > 0) {
+      markDayComplete();
+    }
+  }
+
+  function loadState(page) {
+    const raw = localStorage.getItem(storageKey(page));
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw);
+      const items = document.querySelectorAll('#' + page + ' .item');
+      items.forEach((el, i) => {
+        if (state[i]) {
+          el.classList.add('checked');
+          el.setAttribute('aria-checked', 'true');
+        }
+      });
+    } catch(e) {}
+  }
+
+  // ── Clean up old storage (keep 7 days) ──
+  function cleanOldStorage() {
+    const today = new Date();
+    const keys = Object.keys(localStorage);
+    keys.forEach(k => {
+      if (!k.startsWith('supp_')) return;
+      const dateStr = k.split('_').pop();
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return;
+      const diff = (today - d) / (1000 * 60 * 60 * 24);
+      if (diff > 7) localStorage.removeItem(k);
+    });
+  }
+
+  // ── Streak Tracking ──
+  function markDayComplete() {
+    const streakData = JSON.parse(localStorage.getItem('supp_streak') || '{}');
+    streakData[todayStr()] = true;
+    localStorage.setItem('supp_streak', JSON.stringify(streakData));
+    updateStreak();
+  }
+
+  function getStreak() {
+    const data = JSON.parse(localStorage.getItem('supp_streak') || '{}');
+    let streak = 0;
+    const d = new Date();
+    // Check today first
+    if (data[todayStr()]) streak++;
+    // Then check backwards
+    for (let i = 1; i < 365; i++) {
+      const prev = new Date(d);
+      prev.setDate(prev.getDate() - i);
+      const key = prev.getFullYear() + '-' + String(prev.getMonth()+1).padStart(2,'0') + '-' + String(prev.getDate()).padStart(2,'0');
+      if (data[key]) { streak++; } else { break; }
+    }
+    return streak;
+  }
+
+  function updateStreak() {
+    const streak = getStreak();
+    ['train','rest'].forEach(page => {
+      const bar = document.getElementById(page + '-streak');
+      if (streak > 1) {
+        bar.style.display = 'flex';
+        bar.innerHTML = '<span class="streak-num">🔥 ' + streak + '</span> 天連續完成';
+      } else if (streak === 1) {
+        bar.style.display = 'flex';
+        bar.innerHTML = '<span class="streak-num">✅ 1</span> 天已完成，繼續保持！';
+      } else {
+        bar.style.display = 'none';
+      }
+    });
+  }
+
+  // ── Dark Mode ──
+  function initTheme() {
+    const saved = localStorage.getItem('supp_theme');
+    const btn = document.getElementById('theme-toggle');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+    updateThemeIcon();
+    btn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const next = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('supp_theme', next);
+      updateThemeIcon();
+    });
+  }
+
+  function updateThemeIcon() {
+    const btn = document.getElementById('theme-toggle');
+    const theme = document.documentElement.getAttribute('data-theme');
+    const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    btn.textContent = isDark ? '☀️' : '🌙';
+  }
+
+  // ── Auto-select today's tab ──
+  function autoSelectTab() {
+    const targetTab = isTrainingDay() ? 'train' : 'rest';
+    const btn = document.getElementById('tab-' + targetTab);
+    showTab(targetTab, btn);
+  }
+
+  // ── Service Worker Registration ──
+  function registerSW() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  }
+
+  // ── Init ──
+  updateDate();
+  initTheme();
+  autoSelectTab();
+  loadState('train');
+  loadState('rest');
+  updateProgress();
+  updateStreak();
+  cleanOldStorage();
+  registerSW();
+</script>
+</body>
+</html>

@@ -28,7 +28,6 @@
     --radius: 12px; --radius-sm: 8px;
     --header-bg: #1A1A1A;
   }
-
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #121212; --card: #1E1E1E;
@@ -66,13 +65,14 @@
   .header-row { display: flex; align-items: center; justify-content: space-between; }
   header h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
   header .date { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  .header-actions { display: flex; gap: 6px; }
   .progress-wrap { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
   .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; }
   .progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s ease, background 0.3s; width: 0%; }
   .progress-text { font-size: 11px; color: rgba(255,255,255,0.55); min-width: 36px; text-align: right; }
 
-  .theme-btn { background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: rgba(255,255,255,0.6); font-size: 16px; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
-  .theme-btn:active { background: rgba(255,255,255,0.1); }
+  .hdr-btn { background: none; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; color: rgba(255,255,255,0.6); font-size: 16px; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .hdr-btn:active { background: rgba(255,255,255,0.1); }
 
   .tabs { display: flex; background: var(--bg); position: sticky; top: 84px; z-index: 90; border-bottom: 1px solid var(--border); transition: background 0.3s; }
   .tab { flex: 1; text-align: center; padding: 11px 4px; font-size: 13px; font-weight: 500; color: var(--text-3); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-family: 'Noto Sans TC', sans-serif; }
@@ -104,7 +104,6 @@
 
   .checkbox { width: 22px; height: 22px; border: 2px solid var(--text-3); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; margin-top: 1px; background: var(--card); }
   .item.checked .checkbox { background: var(--check); border-color: var(--check); }
-
   .check-icon { display: none; width: 12px; height: 9px; position: relative; }
   .check-icon::after { content: ''; position: absolute; left: 1px; top: 1px; width: 10px; height: 7px; border-left: 2.5px solid white; border-bottom: 2.5px solid white; transform: rotate(-45deg); }
   .item.checked .check-icon { display: block; }
@@ -151,6 +150,87 @@
 
   .streak-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--amber-bg); border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; font-weight: 600; color: var(--amber); }
   .streak-bar .streak-num { font-size: 18px; }
+
+  /* ── Stats ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; text-align: center; transition: background 0.3s; }
+  .stat-value { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 11px; color: var(--text-2); margin-top: 4px; }
+
+  /* ── History Calendar ── */
+  .history-section { margin-bottom: 20px; }
+  .history-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+  .cal-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; color: var(--text-3); margin-bottom: 4px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 11px; font-weight: 500; color: var(--text-3); }
+  .cal-cell.complete { background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .cal-cell.partial { background: var(--amber-bg); color: var(--amber); font-weight: 600; }
+  .cal-cell.missed { background: var(--gray-bg); color: var(--text-3); }
+  .cal-cell.future { opacity: 0.2; }
+  .cal-cell.today { outline: 2px solid var(--blue); outline-offset: -2px; }
+  .cal-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 11px; color: var(--text-3); }
+  .cal-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; margin-right: 3px; }
+
+  /* ── Modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal { background: var(--card); border-radius: 16px 16px 0 0; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from { transform: translateY(40px); } to { transform: translateY(0); } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--card); z-index: 1; }
+  .modal-header h2 { font-size: 16px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 22px; color: var(--text-2); cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+  .modal-close:active { background: var(--bg); }
+  .modal-body { padding: 16px 20px 32px; }
+
+  /* ── Settings ── */
+  .stg-section { margin-bottom: 20px; }
+  .stg-title { font-size: 14px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .stg-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+  .stg-label { font-size: 13px; }
+  .toggle { position: relative; width: 44px; height: 24px; background: var(--text-3); border-radius: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; border: none; }
+  .toggle.on { background: var(--green); }
+  .toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.2s; }
+  .toggle.on::after { transform: translateX(20px); }
+  .notif-times { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .notif-row { display: flex; align-items: center; justify-content: space-between; }
+  .notif-label { font-size: 13px; }
+  .notif-time { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: var(--card); color: var(--text); font-family: 'Noto Sans TC', sans-serif; }
+  .stg-note { font-size: 11px; color: var(--text-3); margin-top: 6px; }
+
+  /* ── Supplement Management ── */
+  .stg-tabs { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .stg-tab { flex: 1; padding: 8px; text-align: center; font-size: 12px; font-weight: 500; border: none; background: var(--card); color: var(--text-2); cursor: pointer; font-family: 'Noto Sans TC', sans-serif; }
+  .stg-tab.active { background: var(--blue); color: white; }
+  .mg-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 10px; overflow: hidden; }
+  .mg-section-hd { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg); }
+  .mg-section-title { flex: 1; font-size: 13px; font-weight: 600; }
+  .mg-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid var(--border); font-size: 12px; }
+  .mg-item .pill { font-size: 10px; min-width: 56px; }
+  .mg-item-info { flex: 1; }
+  .mg-btn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; color: var(--text-2); font-family: 'Noto Sans TC', sans-serif; }
+  .mg-btn:active { background: var(--bg); }
+  .mg-btn.danger { color: var(--coral); border-color: var(--coral); }
+  .mg-add-row { padding: 8px 14px; border-top: 1px solid var(--border); }
+  .mg-add-row .mg-btn { width: 100%; text-align: center; }
+
+  /* ── Item Form ── */
+  .frm-row { margin-bottom: 10px; }
+  .frm-label { font-size: 11px; color: var(--text-2); margin-bottom: 4px; display: block; }
+  .frm-input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: var(--card); color: var(--text); font-family: 'Noto Sans TC', sans-serif; }
+  .frm-input:focus { outline: 2px solid var(--blue); border-color: transparent; }
+  .color-opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .color-opt { width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: border-color 0.15s; }
+  .color-opt.sel { border-color: var(--text); transform: scale(1.1); }
+  .frm-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .frm-btn { flex: 1; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Noto Sans TC', sans-serif; background: var(--card); color: var(--text); }
+  .frm-btn.primary { background: var(--blue); color: white; border-color: var(--blue); }
+  .frm-btn:active { opacity: 0.8; }
+
+  /* ── Data Buttons ── */
+  .data-btns { display: flex; flex-direction: column; gap: 8px; }
+  .data-btn { padding: 11px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; background: var(--card); color: var(--text); font-family: 'Noto Sans TC', sans-serif; transition: background 0.15s; }
+  .data-btn:active { background: var(--bg); }
+  .data-btn.danger { border-color: var(--coral); color: var(--coral); }
 </style>
 </head>
 <body>
@@ -161,7 +241,10 @@
       <h1>Justin 補充劑時間表</h1>
       <div class="date" id="today-date"></div>
     </div>
-    <button class="theme-btn" id="theme-toggle" aria-label="切換深色模式" title="切換深色模式"></button>
+    <div class="header-actions">
+      <button class="hdr-btn" id="theme-toggle" aria-label="切換深色模式"></button>
+      <button class="hdr-btn" id="settings-btn" aria-label="設定" onclick="openSettings()">&#9881;</button>
+    </div>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
@@ -175,333 +258,726 @@
   <button class="tab" role="tab" aria-selected="false" aria-controls="summary" id="tab-summary" onclick="showTab('summary',this)" tabindex="-1">總覽</button>
 </div>
 
-<!-- 訓練日 -->
-<div id="train" class="page active" role="tabpanel" aria-labelledby="tab-train">
-  <div class="page-label">週一 二 三 五 六</div>
-  <div id="train-streak" class="streak-bar" style="display:none;"></div>
-  <div id="train-done" class="done-banner">今日補充劑全部完成 ✓</div>
+<div id="train" class="page active" role="tabpanel" aria-labelledby="tab-train"></div>
+<div id="rest" class="page" role="tabpanel" aria-labelledby="tab-rest"></div>
+<div id="summary" class="page" role="tabpanel" aria-labelledby="tab-summary"></div>
 
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#1A5FBF;"></div><span class="section-title">早餐時</span><span class="section-count">4 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div><div class="item-note">早午晚各一，共 3 顆／天</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">空腹吃容易魚腥打嗝</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">隨餐吸收率較高</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-coral">瑪卡</span><div class="item-body"><div class="item-name">1–2 顆，隨餐</div><div class="item-note">早上吃，避免影響睡眠</div></div></div>
+<div id="settings-overlay" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-header"><h2>設定</h2><button class="modal-close" onclick="closeSettings()">&times;</button></div>
+    <div class="modal-body" id="settings-body"></div>
   </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#BA7517;"></div><span class="section-title">午餐時</span><span class="section-count">1 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#534AB7;"></div><span class="section-title">晚餐時</span><span class="section-count">3 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐吞服</div><div class="item-note">今日第 3 顆</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">早晚各一，共 2 顆</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">早晚各一，共 2 顆</div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#1A7A4A;"></div><span class="section-title">晚餐後 30 分鐘（訓練前）</span><span class="section-count">3 項，同一杯</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-teal">乳清蛋白</span><div class="item-body"><div class="item-name">1 份，加水 300ml 搖勻</div><div class="item-note">其他粉末全加進這一杯</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">肌酸</span><div class="item-body"><div class="item-name">5g（1 平匙）加進乳清</div><div class="item-note">一起搖勻喝下</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">L-瓜胺酸</span><div class="item-body"><div class="item-name">3–5g 加進乳清</div><div class="item-note">或改吃 L-Arginine 1 顆，擇一</div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#993C1D;"></div><span class="section-title">訓練後 30 分鐘內</span><span class="section-count">1 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'train')" onkeydown="handleKey(event,this,'train')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-teal">乳清蛋白</span><div class="item-body"><div class="item-name">1 份，加水搖勻</div><div class="item-note">這杯只喝乳清，不用加其他粉末</div></div></div>
-  </div>
-
-  <div class="note-box">喝水目標 3,000ml 以上 — 肌酸和瓜胺酸需要足夠水分才能發揮效果</div>
-  <button class="reset-btn" onclick="resetPage('train')">重設今日打勾</button>
 </div>
 
-<!-- 休息日 -->
-<div id="rest" class="page" role="tabpanel" aria-labelledby="tab-rest">
-  <div class="page-label">週四 日</div>
-  <div id="rest-streak" class="streak-bar" style="display:none;"></div>
-  <div id="rest-done" class="done-banner">今日補充劑全部完成 ✓</div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#1A5FBF;"></div><span class="section-title">早餐時</span><span class="section-count">5 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-coral">瑪卡</span><div class="item-body"><div class="item-name">1–2 顆，隨餐</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-amber">肌酸</span><div class="item-body"><div class="item-name">5g 加進早餐飲品或乳清</div><div class="item-note">休息日也要吃，維持肌肉內濃度</div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#BA7517;"></div><span class="section-title">午餐時</span><span class="section-count">1 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-  </div>
-
-  <div class="section">
-    <div class="section-header"><div class="dot" style="background:#534AB7;"></div><span class="section-title">晚餐時</span><span class="section-count">3 項</span></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-blue">Opti-Men</span><div class="item-body"><div class="item-name">1 顆，隨餐</div><div class="item-note">今日第 3 顆</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-green">魚油</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-    <div class="item" role="checkbox" aria-checked="false" tabindex="0" onclick="toggle(this,'rest')" onkeydown="handleKey(event,this,'rest')"><div class="checkbox"><div class="check-icon"></div></div><span class="pill pill-purple">卵磷脂</span><div class="item-body"><div class="item-name">1 顆，隨餐</div></div></div>
-  </div>
-
-  <div class="note-box">休息日不需要 L-瓜胺酸和 L-Arginine，其餘全部照常。喝水 2,500ml</div>
-  <button class="reset-btn" onclick="resetPage('rest')">重設今日打勾</button>
-</div>
-
-<!-- 總覽 -->
-<div id="summary" class="page" role="tabpanel" aria-labelledby="tab-summary">
-  <div class="summary-card">
-    <div class="sum-row"><span class="pill pill-blue" style="min-width:70px;text-align:center;">Opti-Men</span><div class="sum-info"><div class="sum-name">綜合維生素</div><div class="sum-detail">早午晚各 1 顆，共 3 顆 · 一定隨餐</div></div><span class="badge badge-daily">每天</span></div>
-    <div class="sum-row"><span class="pill pill-green" style="min-width:70px;text-align:center;">魚油</span><div class="sum-info"><div class="sum-name">Omega-3 高濃縮</div><div class="sum-detail">早晚各 1 顆，共 2 顆 · 隨餐</div></div><span class="badge badge-daily">每天</span></div>
-    <div class="sum-row"><span class="pill pill-purple" style="min-width:70px;text-align:center;">卵磷脂</span><div class="sum-info"><div class="sum-name">葵花卵磷脂 1,200mg</div><div class="sum-detail">早晚各 1 顆，共 2 顆 · 隨餐</div></div><span class="badge badge-daily">每天</span></div>
-    <div class="sum-row"><span class="pill pill-coral" style="min-width:70px;text-align:center;">瑪卡</span><div class="sum-info"><div class="sum-name">Raw Maca 750mg</div><div class="sum-detail">早餐 1–2 顆 · 避免下午後吃</div></div><span class="badge badge-daily">每天</span></div>
-    <div class="sum-row"><span class="pill pill-amber" style="min-width:70px;text-align:center;">肌酸</span><div class="sum-info"><div class="sum-name">Creatine Monohydrate</div><div class="sum-detail">每天 5g · 訓練日加訓練前乳清；休息日加早餐</div></div><span class="badge badge-daily">每天</span></div>
-    <div class="sum-row"><span class="pill pill-teal" style="min-width:70px;text-align:center;">乳清蛋白</span><div class="sum-info"><div class="sum-name">Whey Protein</div><div class="sum-detail">晚餐後 30 分（訓練前）+ 訓練後各 1 份</div></div><span class="badge badge-opt">依需求</span></div>
-    <div class="sum-row"><span class="pill pill-amber" style="min-width:70px;text-align:center;">L-瓜胺酸</span><div class="sum-info"><div class="sum-name">L-Citrulline 3–5g</div><div class="sum-detail">訓練前乳清裡 · 與 L-Arginine 擇一</div></div><span class="badge badge-train">訓練日</span></div>
-    <div class="sum-row"><span class="pill pill-gray" style="min-width:70px;text-align:center;">L-精胺酸</span><div class="sum-info"><div class="sum-name">L-Arginine 1,000mg</div><div class="sum-detail">懶得量粉末時取代瓜胺酸，擇一即可</div></div><span class="badge badge-opt">訓練日備用</span></div>
-  </div>
-
-  <div class="rules-card">
-    <div class="rules-title">重要原則</div>
-    <div class="rule-row"><span class="rule-icon">💊</span><span class="rule-text"><strong>Opti-Men、魚油、卵磷脂</strong> 一定要跟食物一起吃，空腹吃容易不舒服</span></div>
-    <div class="rule-row"><span class="rule-icon">⚡</span><span class="rule-text"><strong>肌酸不能跳過休息日</strong>，濃度穩定才有效，斷斷續續效果打折</span></div>
-    <div class="rule-row"><span class="rule-icon">🌅</span><span class="rule-text"><strong>瑪卡固定早餐吃</strong>，下午後吃少數人會睡不著</span></div>
-    <div class="rule-row"><span class="rule-icon">🏋️</span><span class="rule-text"><strong>訓練前乳清</strong>在晚餐後 30 分喝，訓練後 30 分內再補一杯</span></div>
-  </div>
-
-  <div style="text-align:center;margin-top:20px;padding-bottom:8px;">
-    <p style="font-size:11px;color:var(--text-3);">Justin · 2026.03</p>
-  </div>
+<div id="item-overlay" class="modal-overlay" style="display:none;" onclick="if(event.target===this)closeItemForm()">
+  <div class="modal" id="item-modal"></div>
 </div>
 
 <script>
-  // ── Helpers ──
-  function todayStr() {
-    const d = new Date();
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  }
+// ══════════════════════════════════════
+// ── Default Configuration ──
+// ══════════════════════════════════════
+function defaultConfig() {
+  return {
+    train: [
+      { id:'ts1', title:'早餐時', dotColor:'#1A5FBF', items:[
+        { id:'t1', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐吞服', note:'早午晚各一，共 3 顆／天' },
+        { id:'t2', pill:'魚油', color:'green', name:'1 顆，隨餐', note:'空腹吃容易魚腥打嗝' },
+        { id:'t3', pill:'卵磷脂', color:'purple', name:'1 顆，隨餐', note:'隨餐吸收率較高' },
+        { id:'t4', pill:'瑪卡', color:'coral', name:'1–2 顆，隨餐', note:'早上吃，避免影響睡眠' }
+      ]},
+      { id:'ts2', title:'午餐時', dotColor:'#BA7517', items:[
+        { id:'t5', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐吞服', note:'' }
+      ]},
+      { id:'ts3', title:'晚餐時', dotColor:'#534AB7', items:[
+        { id:'t6', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐吞服', note:'今日第 3 顆' },
+        { id:'t7', pill:'魚油', color:'green', name:'1 顆，隨餐', note:'早晚各一，共 2 顆' },
+        { id:'t8', pill:'卵磷脂', color:'purple', name:'1 顆，隨餐', note:'早晚各一，共 2 顆' }
+      ]},
+      { id:'ts4', title:'晚餐後 30 分鐘（訓練前）', dotColor:'#1A7A4A', countNote:'同一杯', items:[
+        { id:'t9', pill:'乳清蛋白', color:'teal', name:'1 份，加水 300ml 搖勻', note:'其他粉末全加進這一杯' },
+        { id:'t10', pill:'肌酸', color:'amber', name:'5g（1 平匙）加進乳清', note:'一起搖勻喝下' },
+        { id:'t11', pill:'L-瓜胺酸', color:'amber', name:'3–5g 加進乳清', note:'或改吃 L-Arginine 1 顆，擇一' }
+      ]},
+      { id:'ts5', title:'訓練後 30 分鐘內', dotColor:'#993C1D', items:[
+        { id:'t12', pill:'乳清蛋白', color:'teal', name:'1 份，加水搖勻', note:'這杯只喝乳清，不用加其他粉末' }
+      ]}
+    ],
+    rest: [
+      { id:'rs1', title:'早餐時', dotColor:'#1A5FBF', items:[
+        { id:'r1', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐', note:'' },
+        { id:'r2', pill:'魚油', color:'green', name:'1 顆，隨餐', note:'' },
+        { id:'r3', pill:'卵磷脂', color:'purple', name:'1 顆，隨餐', note:'' },
+        { id:'r4', pill:'瑪卡', color:'coral', name:'1–2 顆，隨餐', note:'' },
+        { id:'r5', pill:'肌酸', color:'amber', name:'5g 加進早餐飲品或乳清', note:'休息日也要吃，維持肌肉內濃度' }
+      ]},
+      { id:'rs2', title:'午餐時', dotColor:'#BA7517', items:[
+        { id:'r6', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐', note:'' }
+      ]},
+      { id:'rs3', title:'晚餐時', dotColor:'#534AB7', items:[
+        { id:'r7', pill:'Opti-Men', color:'blue', name:'1 顆，隨餐', note:'今日第 3 顆' },
+        { id:'r8', pill:'魚油', color:'green', name:'1 顆，隨餐', note:'' },
+        { id:'r9', pill:'卵磷脂', color:'purple', name:'1 顆，隨餐', note:'' }
+      ]}
+    ],
+    summary: [
+      { pill:'Opti-Men', color:'blue', fullName:'綜合維生素', detail:'早午晚各 1 顆，共 3 顆 · 一定隨餐', badge:'daily' },
+      { pill:'魚油', color:'green', fullName:'Omega-3 高濃縮', detail:'早晚各 1 顆，共 2 顆 · 隨餐', badge:'daily' },
+      { pill:'卵磷脂', color:'purple', fullName:'葵花卵磷脂 1,200mg', detail:'早晚各 1 顆，共 2 顆 · 隨餐', badge:'daily' },
+      { pill:'瑪卡', color:'coral', fullName:'Raw Maca 750mg', detail:'早餐 1–2 顆 · 避免下午後吃', badge:'daily' },
+      { pill:'肌酸', color:'amber', fullName:'Creatine Monohydrate', detail:'每天 5g · 訓練日加訓練前乳清；休息日加早餐', badge:'daily' },
+      { pill:'乳清蛋白', color:'teal', fullName:'Whey Protein', detail:'晚餐後 30 分（訓練前）+ 訓練後各 1 份', badge:'optional' },
+      { pill:'L-瓜胺酸', color:'amber', fullName:'L-Citrulline 3–5g', detail:'訓練前乳清裡 · 與 L-Arginine 擇一', badge:'training' },
+      { pill:'L-精胺酸', color:'gray', fullName:'L-Arginine 1,000mg', detail:'懶得量粉末時取代瓜胺酸，擇一即可', badge:'optional' }
+    ],
+    rules: [
+      { icon:'💊', text:'<strong>Opti-Men、魚油、卵磷脂</strong> 一定要跟食物一起吃，空腹吃容易不舒服' },
+      { icon:'⚡', text:'<strong>肌酸不能跳過休息日</strong>，濃度穩定才有效，斷斷續續效果打折' },
+      { icon:'🌅', text:'<strong>瑪卡固定早餐吃</strong>，下午後吃少數人會睡不著' },
+      { icon:'🏋️', text:'<strong>訓練前乳清</strong>在晚餐後 30 分喝，訓練後 30 分內再補一杯' }
+    ],
+    notes: { train:'喝水目標 3,000ml 以上 — 肌酸和瓜胺酸需要足夠水分才能發揮效果', rest:'休息日不需要 L-瓜胺酸和 L-Arginine，其餘全部照常。喝水 2,500ml' },
+    dayLabels: { train:'週一 二 三 五 六', rest:'週四 日' }
+  };
+}
 
-  function isTrainingDay() {
-    const day = new Date().getDay(); // 0=Sun
-    return [1,2,3,5,6].includes(day); // Mon,Tue,Wed,Fri,Sat
-  }
+// ══════════════════════════════════════
+// ── Helpers ──
+// ══════════════════════════════════════
+function todayStr() { return formatDate(new Date()); }
+function formatDate(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function isTrainingDay(d) {
+  return [1,2,3,5,6].includes((d||new Date()).getDay());
+}
+function pageForDay(d) { return isTrainingDay(d) ? 'train' : 'rest'; }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
-  // ── Date Display ──
-  function updateDate() {
-    const d = new Date();
-    const days = ['日','一','二','三','四','五','六'];
-    const type = isTrainingDay() ? '訓練日' : '休息日';
-    document.getElementById('today-date').textContent =
-      d.getFullYear() + ' 年 ' + (d.getMonth()+1) + ' 月 ' + d.getDate() + ' 日　週' + days[d.getDay()] + '（' + type + '）';
-  }
+// ══════════════════════════════════════
+// ── Config Storage ──
+// ══════════════════════════════════════
+function getConfig() {
+  const raw = localStorage.getItem('supp_config');
+  return raw ? JSON.parse(raw) : defaultConfig();
+}
+function saveConfig(c) { localStorage.setItem('supp_config', JSON.stringify(c)); }
 
-  // ── Progress ──
-  function getProgressColor(pct) {
-    if (pct < 40) return '#FBBF24';
-    if (pct < 75) return '#34D399';
-    return '#4ADE80';
-  }
+// ══════════════════════════════════════
+// ── Check Storage ──
+// ══════════════════════════════════════
+function getChecks(date) {
+  const raw = localStorage.getItem('supp_checks_'+date);
+  return raw ? JSON.parse(raw) : {};
+}
+function saveChecks(date, checks) {
+  localStorage.setItem('supp_checks_'+date, JSON.stringify(checks));
+}
 
-  function updateProgress() {
-    const active = document.querySelector('.page.active');
-    const fill = document.getElementById('progress-fill');
-    const text = document.getElementById('progress-text');
-    if (!active || active.id === 'summary') {
-      fill.style.width = '0%';
-      fill.style.background = '#4ADE80';
-      text.textContent = '';
-      return;
-    }
-    const id = active.id;
-    const all = active.querySelectorAll('.item');
-    const done = active.querySelectorAll('.item.checked').length;
-    const total = all.length;
-    const pct = total ? Math.round(done / total * 100) : 0;
-    fill.style.width = pct + '%';
-    fill.style.background = getProgressColor(pct);
-    text.textContent = done + ' / ' + total;
-    const banner = document.getElementById(id + '-done');
-    if (banner) banner.classList.toggle('show', done === total && total > 0);
-  }
-
-  // ── Toggle & Keyboard ──
-  function toggle(el, page) {
-    const isChecked = el.classList.toggle('checked');
-    el.setAttribute('aria-checked', isChecked);
-    saveState(page);
-    updateProgress();
-  }
-
-  function handleKey(e, el, page) {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      toggle(el, page);
-    }
-  }
-
-  // ── Reset ──
-  function resetPage(page) {
-    document.querySelectorAll('#' + page + ' .item').forEach(el => {
-      el.classList.remove('checked');
-      el.setAttribute('aria-checked', 'false');
-    });
-    const b = document.getElementById(page + '-done');
-    if (b) b.classList.remove('show');
-    saveState(page);
-    updateProgress();
-  }
-
-  // ── Tabs ──
-  function showTab(id, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(b => {
-      b.classList.remove('active');
-      b.setAttribute('aria-selected', 'false');
-      b.tabIndex = -1;
-    });
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-    btn.setAttribute('aria-selected', 'true');
-    btn.tabIndex = 0;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    updateProgress();
-  }
-
-  // ── LocalStorage Persistence ──
-  function storageKey(page) {
-    return 'supp_' + page + '_' + todayStr();
-  }
-
-  function saveState(page) {
-    const items = document.querySelectorAll('#' + page + ' .item');
-    const state = [];
-    items.forEach(el => state.push(el.classList.contains('checked')));
-    localStorage.setItem(storageKey(page), JSON.stringify(state));
-    // Record completion for streak
-    const done = state.filter(Boolean).length;
-    if (done === state.length && state.length > 0) {
-      markDayComplete();
-    }
-  }
-
-  function loadState(page) {
-    const raw = localStorage.getItem(storageKey(page));
-    if (!raw) return;
-    try {
-      const state = JSON.parse(raw);
-      const items = document.querySelectorAll('#' + page + ' .item');
-      items.forEach((el, i) => {
-        if (state[i]) {
-          el.classList.add('checked');
-          el.setAttribute('aria-checked', 'true');
-        }
-      });
-    } catch(e) {}
-  }
-
-  // ── Clean up old storage (keep 7 days) ──
-  function cleanOldStorage() {
-    const today = new Date();
-    const keys = Object.keys(localStorage);
-    keys.forEach(k => {
-      if (!k.startsWith('supp_')) return;
-      const dateStr = k.split('_').pop();
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return;
-      const diff = (today - d) / (1000 * 60 * 60 * 24);
-      if (diff > 7) localStorage.removeItem(k);
-    });
-  }
-
-  // ── Streak Tracking ──
-  function markDayComplete() {
-    const streakData = JSON.parse(localStorage.getItem('supp_streak') || '{}');
-    streakData[todayStr()] = true;
-    localStorage.setItem('supp_streak', JSON.stringify(streakData));
-    updateStreak();
-  }
-
-  function getStreak() {
-    const data = JSON.parse(localStorage.getItem('supp_streak') || '{}');
-    let streak = 0;
-    const d = new Date();
-    // Check today first
-    if (data[todayStr()]) streak++;
-    // Then check backwards
-    for (let i = 1; i < 365; i++) {
-      const prev = new Date(d);
-      prev.setDate(prev.getDate() - i);
-      const key = prev.getFullYear() + '-' + String(prev.getMonth()+1).padStart(2,'0') + '-' + String(prev.getDate()).padStart(2,'0');
-      if (data[key]) { streak++; } else { break; }
-    }
-    return streak;
-  }
-
-  function updateStreak() {
-    const streak = getStreak();
+// ══════════════════════════════════════
+// ── Migration from old format ──
+// ══════════════════════════════════════
+function migrateOldData() {
+  if (localStorage.getItem('supp_migrated_v2')) return;
+  const cfg = defaultConfig();
+  for (let i=0; i<30; i++) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    const ds = formatDate(d);
     ['train','rest'].forEach(page => {
-      const bar = document.getElementById(page + '-streak');
-      if (streak > 1) {
-        bar.style.display = 'flex';
-        bar.innerHTML = '<span class="streak-num">🔥 ' + streak + '</span> 天連續完成';
-      } else if (streak === 1) {
-        bar.style.display = 'flex';
-        bar.innerHTML = '<span class="streak-num">✅ 1</span> 天已完成，繼續保持！';
-      } else {
-        bar.style.display = 'none';
-      }
+      const oldKey = 'supp_'+page+'_'+ds;
+      const raw = localStorage.getItem(oldKey);
+      if (!raw) return;
+      try {
+        const bools = JSON.parse(raw);
+        const allItems = cfg[page].flatMap(s=>s.items);
+        const ids = [];
+        bools.forEach((b,idx) => { if(b && allItems[idx]) ids.push(allItems[idx].id); });
+        const existing = getChecks(ds);
+        if (!existing[page] || existing[page].length===0) {
+          existing[page] = ids;
+          saveChecks(ds, existing);
+        }
+      } catch(e){}
+      localStorage.removeItem(oldKey);
     });
   }
+  localStorage.setItem('supp_migrated_v2','true');
+}
 
-  // ── Dark Mode ──
-  function initTheme() {
-    const saved = localStorage.getItem('supp_theme');
-    const btn = document.getElementById('theme-toggle');
-    if (saved) {
-      document.documentElement.setAttribute('data-theme', saved);
-    }
-    updateThemeIcon();
-    btn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const isDark = current === 'dark' || (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      const next = isDark ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      localStorage.setItem('supp_theme', next);
-      updateThemeIcon();
+// ══════════════════════════════════════
+// ── Date Display ──
+// ══════════════════════════════════════
+function updateDate() {
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const type = isTrainingDay() ? '訓練日' : '休息日';
+  document.getElementById('today-date').textContent =
+    d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日　週'+days[d.getDay()]+'（'+type+'）';
+}
+
+// ══════════════════════════════════════
+// ── Progress ──
+// ══════════════════════════════════════
+function getProgressColor(p) { return p<40?'#FBBF24':p<75?'#34D399':'#4ADE80'; }
+function updateProgress() {
+  const active = document.querySelector('.page.active');
+  const fill = document.getElementById('progress-fill');
+  const text = document.getElementById('progress-text');
+  if (!active || active.id==='summary') { fill.style.width='0%'; text.textContent=''; return; }
+  const all = active.querySelectorAll('.item');
+  const done = active.querySelectorAll('.item.checked').length;
+  const total = all.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  fill.style.width = pct+'%';
+  fill.style.background = getProgressColor(pct);
+  text.textContent = done+' / '+total;
+}
+
+// ══════════════════════════════════════
+// ── Render Checklist Pages ──
+// ══════════════════════════════════════
+function renderPage(pageId) {
+  const config = getConfig();
+  const sections = config[pageId];
+  if (!sections) return;
+  const checks = getChecks(todayStr());
+  const checkedIds = checks[pageId] || [];
+  let h = '';
+  h += '<div class="page-label">'+config.dayLabels[pageId]+'</div>';
+  h += '<div id="'+pageId+'-streak" class="streak-bar" style="display:none;"></div>';
+  h += '<div id="'+pageId+'-done" class="done-banner">今日補充劑全部完成 ✓</div>';
+  sections.forEach(sec => {
+    const countText = sec.items.length+' 項'+(sec.countNote ? '，'+sec.countNote : '');
+    h += '<div class="section">';
+    h += '<div class="section-header"><div class="dot" style="background:'+sec.dotColor+';"></div><span class="section-title">'+sec.title+'</span><span class="section-count">'+countText+'</span></div>';
+    sec.items.forEach(item => {
+      const ck = checkedIds.includes(item.id);
+      h += '<div class="item'+(ck?' checked':'')+'" role="checkbox" aria-checked="'+ck+'" tabindex="0" data-id="'+item.id+'" data-page="'+pageId+'">';
+      h += '<div class="checkbox"><div class="check-icon"></div></div>';
+      h += '<span class="pill pill-'+item.color+'">'+item.pill+'</span>';
+      h += '<div class="item-body"><div class="item-name">'+item.name+'</div>';
+      if (item.note) h += '<div class="item-note">'+item.note+'</div>';
+      h += '</div></div>';
     });
-  }
+    h += '</div>';
+  });
+  h += '<div class="note-box">'+config.notes[pageId]+'</div>';
+  h += '<button class="reset-btn" onclick="resetPage(\''+pageId+'\')">重設今日打勾</button>';
+  document.getElementById(pageId).innerHTML = h;
+  // Bind events
+  document.getElementById(pageId).querySelectorAll('.item').forEach(el => {
+    el.addEventListener('click', () => toggleItem(el));
+    el.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleItem(el);} });
+  });
+  // Done banner
+  const allItems = sections.flatMap(s=>s.items);
+  const banner = document.getElementById(pageId+'-done');
+  if (banner) banner.classList.toggle('show', allItems.length>0 && allItems.every(it=>checkedIds.includes(it.id)));
+}
 
-  function updateThemeIcon() {
-    const btn = document.getElementById('theme-toggle');
-    const theme = document.documentElement.getAttribute('data-theme');
-    const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    btn.textContent = isDark ? '☀️' : '🌙';
-  }
+// ══════════════════════════════════════
+// ── Toggle & Reset ──
+// ══════════════════════════════════════
+function toggleItem(el) {
+  const id = el.dataset.id, page = el.dataset.page;
+  const isChecked = el.classList.toggle('checked');
+  el.setAttribute('aria-checked', String(isChecked));
+  if (navigator.vibrate) navigator.vibrate(10);
+  const date = todayStr();
+  const checks = getChecks(date);
+  if (!checks[page]) checks[page] = [];
+  if (isChecked) { if(!checks[page].includes(id)) checks[page].push(id); }
+  else { checks[page] = checks[page].filter(x=>x!==id); }
+  saveChecks(date, checks);
+  updateProgress();
+  checkDayComplete(page);
+}
 
-  // ── Auto-select today's tab ──
-  function autoSelectTab() {
-    const targetTab = isTrainingDay() ? 'train' : 'rest';
-    const btn = document.getElementById('tab-' + targetTab);
-    showTab(targetTab, btn);
-  }
-
-  // ── Service Worker Registration ──
-  function registerSW() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
-  }
-
-  // ── Init ──
-  updateDate();
-  initTheme();
-  autoSelectTab();
-  loadState('train');
-  loadState('rest');
+function resetPage(page) {
+  if (!confirm('確定要重設今日所有打勾嗎？')) return;
+  const date = todayStr();
+  const checks = getChecks(date);
+  checks[page] = [];
+  saveChecks(date, checks);
+  const streak = JSON.parse(localStorage.getItem('supp_streak')||'{}');
+  delete streak[date];
+  localStorage.setItem('supp_streak', JSON.stringify(streak));
+  renderPage(page);
   updateProgress();
   updateStreak();
-  cleanOldStorage();
-  registerSW();
+}
+
+// ══════════════════════════════════════
+// ── Streak (fixed logic) ──
+// ══════════════════════════════════════
+function checkDayComplete(page) {
+  const config = getConfig();
+  const date = todayStr();
+  const checks = getChecks(date);
+  const correctPage = pageForDay(new Date());
+  const allItems = config[correctPage].flatMap(s=>s.items);
+  const checkedIds = checks[correctPage] || [];
+  const complete = allItems.length>0 && allItems.every(it=>checkedIds.includes(it.id));
+  const streak = JSON.parse(localStorage.getItem('supp_streak')||'{}');
+  if (complete) streak[date]=true; else delete streak[date];
+  localStorage.setItem('supp_streak', JSON.stringify(streak));
+  updateStreak();
+  // Banner
+  const banner = document.getElementById(page+'-done');
+  const pageItems = config[page].flatMap(s=>s.items);
+  const pageChecked = checks[page]||[];
+  if (banner) banner.classList.toggle('show', pageItems.length>0 && pageItems.every(it=>pageChecked.includes(it.id)));
+}
+
+function getStreak() {
+  const data = JSON.parse(localStorage.getItem('supp_streak')||'{}');
+  let streak = 0;
+  const d = new Date();
+  if (data[todayStr()]) streak++;
+  for (let i=1;i<365;i++) {
+    const prev = new Date(d); prev.setDate(prev.getDate()-i);
+    if (data[formatDate(prev)]) streak++; else break;
+  }
+  return streak;
+}
+
+function updateStreak() {
+  const streak = getStreak();
+  ['train','rest'].forEach(page => {
+    const bar = document.getElementById(page+'-streak');
+    if (!bar) return;
+    if (streak>1) { bar.style.display='flex'; bar.innerHTML='<span class="streak-num">&#128293; '+streak+'</span> 天連續完成'; }
+    else if (streak===1) { bar.style.display='flex'; bar.innerHTML='<span class="streak-num">&#9989; 1</span> 天已完成，繼續保持！'; }
+    else bar.style.display='none';
+  });
+}
+
+// ══════════════════════════════════════
+// ── Tabs ──
+// ══════════════════════════════════════
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>{ b.classList.remove('active'); b.setAttribute('aria-selected','false'); b.tabIndex=-1; });
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  btn.setAttribute('aria-selected','true');
+  btn.tabIndex=0;
+  if (id==='summary') renderSummary();
+  window.scrollTo({top:0,behavior:'smooth'});
+  updateProgress();
+}
+
+function autoSelectTab() {
+  const target = isTrainingDay() ? 'train' : 'rest';
+  showTab(target, document.getElementById('tab-'+target));
+}
+
+// ══════════════════════════════════════
+// ── Summary Page (stats + history + reference) ──
+// ══════════════════════════════════════
+function renderSummary() {
+  const config = getConfig();
+  let h = '';
+  h += buildStats(config);
+  h += buildHistory(config);
+  // Supplement reference
+  h += '<div class="summary-card">';
+  config.summary.forEach(item => {
+    const bc = item.badge==='daily'?'badge-daily':item.badge==='training'?'badge-train':'badge-opt';
+    const bt = item.badge==='daily'?'每天':item.badge==='training'?'訓練日':'依需求';
+    h += '<div class="sum-row"><span class="pill pill-'+item.color+'" style="min-width:70px;text-align:center;">'+item.pill+'</span>';
+    h += '<div class="sum-info"><div class="sum-name">'+item.fullName+'</div><div class="sum-detail">'+item.detail+'</div></div>';
+    h += '<span class="badge '+bc+'">'+bt+'</span></div>';
+  });
+  h += '</div>';
+  // Rules
+  h += '<div class="rules-card"><div class="rules-title">重要原則</div>';
+  config.rules.forEach(r => { h += '<div class="rule-row"><span class="rule-icon">'+r.icon+'</span><span class="rule-text">'+r.text+'</span></div>'; });
+  h += '</div>';
+  h += '<div style="text-align:center;margin-top:20px;padding-bottom:8px;"><p style="font-size:11px;color:var(--text-3);">Justin · 2026.03</p></div>';
+  document.getElementById('summary').innerHTML = h;
+}
+
+function buildStats(config) {
+  const today = new Date();
+  const weekStart = new Date(today);
+  weekStart.setDate(weekStart.getDate()-((today.getDay()+6)%7));
+  weekStart.setHours(0,0,0,0);
+  let wT=0,wD=0,mT=0,mD=0;
+  const missed = {};
+  for (let i=0;i<30;i++) {
+    const d = new Date(today); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+    const ds = formatDate(d);
+    const pg = pageForDay(d);
+    const items = config[pg].flatMap(s=>s.items);
+    const ck = (getChecks(ds)[pg]||[]);
+    const isWeek = d>=weekStart;
+    items.forEach(it => {
+      mT++;
+      if(isWeek) wT++;
+      if(ck.includes(it.id)) { mD++; if(isWeek) wD++; }
+      else { missed[it.pill]=(missed[it.pill]||0)+1; }
+    });
+  }
+  const wPct = wT?Math.round(wD/wT*100):0;
+  const mPct = mT?Math.round(mD/mT*100):0;
+  const colorFor = p => p>=80?'green':p>=50?'amber':'coral';
+  let h = '<div class="stats-grid">';
+  h += '<div class="stat-card"><div class="stat-value" style="color:var(--'+colorFor(wPct)+');">'+wPct+'%</div><div class="stat-label">本週完成率</div></div>';
+  h += '<div class="stat-card"><div class="stat-value" style="color:var(--'+colorFor(mPct)+');">'+mPct+'%</div><div class="stat-label">近 30 天完成率</div></div>';
+  h += '</div>';
+  const top3 = Object.entries(missed).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  if (top3.length>0) {
+    h += '<div class="note-box" style="margin-bottom:16px;"><div style="font-weight:600;margin-bottom:6px;">最常漏掉的補充品</div>';
+    top3.forEach(([name,cnt])=>{ h+='<div style="font-size:12px;">· '+name+'（'+cnt+' 次）</div>'; });
+    h += '</div>';
+  }
+  return h;
+}
+
+function buildHistory(config) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const start = new Date(today); start.setDate(start.getDate()-34);
+  while(start.getDay()!==1) start.setDate(start.getDate()-1);
+  let h = '<div class="history-section"><div class="history-title">最近完成紀錄</div>';
+  h += '<div class="cal-header"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>';
+  h += '<div class="cal-grid">';
+  const d = new Date(start);
+  while(true) {
+    const ds = formatDate(d);
+    const isToday = ds===todayStr();
+    const isFuture = d>today;
+    if (isFuture) {
+      h += '<div class="cal-cell future">'+d.getDate()+'</div>';
+    } else {
+      const pg = pageForDay(d);
+      const items = config[pg].flatMap(s=>s.items);
+      const ck = (getChecks(ds)[pg]||[]);
+      const pct = items.length ? ck.length/items.length : 0;
+      let cls = pct===1?'complete':pct>0?'partial':'missed';
+      h += '<div class="cal-cell '+cls+(isToday?' today':'')+'">'+d.getDate()+'</div>';
+    }
+    d.setDate(d.getDate()+1);
+    if(d>today && d.getDay()===1) break;
+  }
+  h += '</div>';
+  h += '<div class="cal-legend">';
+  h += '<span><span class="cal-legend-dot" style="background:var(--green-bg);"></span>全部完成</span>';
+  h += '<span><span class="cal-legend-dot" style="background:var(--amber-bg);"></span>部分完成</span>';
+  h += '<span><span class="cal-legend-dot" style="background:var(--gray-bg);"></span>未完成</span>';
+  h += '</div></div>';
+  return h;
+}
+
+// ══════════════════════════════════════
+// ── Dark Mode ──
+// ══════════════════════════════════════
+function initTheme() {
+  const saved = localStorage.getItem('supp_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  updateThemeIcon();
+  document.getElementById('theme-toggle').addEventListener('click', ()=>{
+    const cur = document.documentElement.getAttribute('data-theme');
+    const isDark = cur==='dark'||(!cur&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+    const next = isDark?'light':'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('supp_theme', next);
+    updateThemeIcon();
+  });
+}
+function updateThemeIcon() {
+  const btn = document.getElementById('theme-toggle');
+  const t = document.documentElement.getAttribute('data-theme');
+  const isDark = t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+  btn.textContent = isDark?'☀️':'🌙';
+}
+
+// ══════════════════════════════════════
+// ── Notifications ──
+// ══════════════════════════════════════
+function getNotifSettings() {
+  const raw = localStorage.getItem('supp_notif');
+  return raw ? JSON.parse(raw) : { enabled:false, times:{ morning:'08:00', lunch:'12:00', dinner:'18:00' } };
+}
+function saveNotifSettings(s) { localStorage.setItem('supp_notif', JSON.stringify(s)); }
+
+const notifiedSlots = {};
+function initNotifications() {
+  setInterval(()=>{
+    const s = getNotifSettings();
+    if (!s.enabled || Notification.permission!=='granted') return;
+    const now = new Date();
+    const hm = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    const key = todayStr();
+    const slots = [
+      { k:'morning', time:s.times.morning, msg:'早餐時間到了，記得吃補充劑！' },
+      { k:'lunch', time:s.times.lunch, msg:'午餐時間到了，記得吃 Opti-Men！' },
+      { k:'dinner', time:s.times.dinner, msg:'晚餐時間到了，記得吃補充劑！' }
+    ];
+    slots.forEach(slot=>{
+      const nk = key+'_'+slot.k;
+      if (hm===slot.time && !notifiedSlots[nk]) {
+        notifiedSlots[nk]=true;
+        new Notification('補充劑提醒', { body:slot.msg, icon:'icon-192.png' });
+      }
+    });
+  }, 30000);
+}
+
+// ══════════════════════════════════════
+// ── Settings Modal ──
+// ══════════════════════════════════════
+let managePageType = 'train';
+
+function openSettings() {
+  managePageType = 'train';
+  renderSettingsBody();
+  document.getElementById('settings-overlay').style.display='flex';
+}
+function closeSettings() {
+  document.getElementById('settings-overlay').style.display='none';
+}
+
+function renderSettingsBody() {
+  const notif = getNotifSettings();
+  const config = getConfig();
+  let h = '';
+
+  // ── Notifications ──
+  h += '<div class="stg-section"><div class="stg-title">&#128276; 提醒通知</div>';
+  h += '<div class="stg-row"><span class="stg-label">啟用提醒</span>';
+  h += '<button class="toggle'+(notif.enabled?' on':'')+'" onclick="toggleNotif(this)"></button></div>';
+  if (notif.enabled) {
+    h += '<div class="notif-times">';
+    h += '<div class="notif-row"><span class="notif-label">早餐</span><input type="time" class="notif-time" value="'+notif.times.morning+'" onchange="setNotifTime(\'morning\',this.value)"></div>';
+    h += '<div class="notif-row"><span class="notif-label">午餐</span><input type="time" class="notif-time" value="'+notif.times.lunch+'" onchange="setNotifTime(\'lunch\',this.value)"></div>';
+    h += '<div class="notif-row"><span class="notif-label">晚餐</span><input type="time" class="notif-time" value="'+notif.times.dinner+'" onchange="setNotifTime(\'dinner\',this.value)"></div>';
+    h += '</div><div class="stg-note">通知僅在應用程式開啟時有效</div>';
+  }
+  h += '</div>';
+
+  // ── Supplement Management ──
+  h += '<div class="stg-section"><div class="stg-title">&#128138; 補充品管理</div>';
+  h += '<div class="stg-tabs">';
+  h += '<button class="stg-tab'+(managePageType==='train'?' active':'')+'" onclick="managePageType=\'train\';renderSettingsBody()">訓練日</button>';
+  h += '<button class="stg-tab'+(managePageType==='rest'?' active':'')+'" onclick="managePageType=\'rest\';renderSettingsBody()">休息日</button>';
+  h += '</div>';
+  h += buildManageSections(managePageType, config);
+  h += '<button class="data-btn" onclick="addSection(\''+managePageType+'\')" style="margin-top:8px;">+ 新增時段</button>';
+  h += '</div>';
+
+  // ── Data Management ──
+  h += '<div class="stg-section"><div class="stg-title">&#128190; 資料管理</div>';
+  h += '<div class="data-btns">';
+  h += '<button class="data-btn" onclick="exportData()">匯出資料 (JSON)</button>';
+  h += '<button class="data-btn" onclick="importData()">匯入資料</button>';
+  h += '<button class="data-btn danger" onclick="resetToDefaults()">重設為預設值</button>';
+  h += '</div></div>';
+
+  document.getElementById('settings-body').innerHTML = h;
+}
+
+function buildManageSections(page, config) {
+  const sections = config[page];
+  let h = '';
+  sections.forEach((sec,si) => {
+    h += '<div class="mg-section">';
+    h += '<div class="mg-section-hd"><div class="dot" style="background:'+sec.dotColor+';"></div>';
+    h += '<span class="mg-section-title">'+sec.title+'</span>';
+    h += '<button class="mg-btn danger" onclick="deleteSection(\''+page+'\','+si+')" title="刪除">&#10005;</button></div>';
+    sec.items.forEach((item,ii) => {
+      h += '<div class="mg-item"><span class="pill pill-'+item.color+'">'+item.pill+'</span>';
+      h += '<span class="mg-item-info">'+item.name+'</span>';
+      h += '<button class="mg-btn" onclick="editItem(\''+page+'\','+si+','+ii+')">編輯</button> ';
+      h += '<button class="mg-btn danger" onclick="deleteItem(\''+page+'\','+si+','+ii+')">&#10005;</button>';
+      h += '</div>';
+    });
+    h += '<div class="mg-add-row"><button class="mg-btn" onclick="addItem(\''+page+'\','+si+')">+ 新增補充品</button></div>';
+    h += '</div>';
+  });
+  return h;
+}
+
+// ── Notification Helpers ──
+function toggleNotif(btn) {
+  const s = getNotifSettings();
+  if (!s.enabled && 'Notification' in window && Notification.permission==='default') {
+    Notification.requestPermission().then(perm => {
+      if (perm==='granted') { s.enabled=true; saveNotifSettings(s); renderSettingsBody(); }
+      else alert('通知權限被拒絕，請在瀏覽器設定中開啟。');
+    });
+  } else {
+    s.enabled = !s.enabled;
+    saveNotifSettings(s);
+    renderSettingsBody();
+  }
+}
+function setNotifTime(slot,val) {
+  const s = getNotifSettings();
+  s.times[slot] = val;
+  saveNotifSettings(s);
+}
+
+// ── Supplement CRUD ──
+function deleteSection(page,si) {
+  if (!confirm('確定要刪除此時段及其所有補充品？')) return;
+  const c = getConfig(); c[page].splice(si,1); saveConfig(c);
+  renderSettingsBody(); renderPage(page); updateProgress();
+}
+
+function deleteItem(page,si,ii) {
+  if (!confirm('確定要刪除此補充品？')) return;
+  const c = getConfig(); c[page][si].items.splice(ii,1); saveConfig(c);
+  renderSettingsBody(); renderPage(page); updateProgress();
+}
+
+function addSection(page) {
+  const title = prompt('輸入新時段名稱（例：睡前）');
+  if (!title) return;
+  const c = getConfig();
+  c[page].push({ id:'sec_'+uid(), title:title, dotColor:'#555550', items:[] });
+  saveConfig(c); renderSettingsBody(); renderPage(page);
+}
+
+function addItem(page,si) { showItemForm(page,si,null); }
+function editItem(page,si,ii) { showItemForm(page,si,ii); }
+
+// ── Item Form Modal ──
+const COLORS = ['blue','green','amber','purple','teal','coral','gray'];
+const COLOR_CSS = { blue:'var(--blue)', green:'var(--green)', amber:'var(--amber)', purple:'var(--purple)', teal:'var(--teal)', coral:'var(--coral)', gray:'var(--gray)' };
+
+function showItemForm(page,si,ii) {
+  const config = getConfig();
+  const isEdit = ii!==null && ii!==undefined;
+  const item = isEdit ? config[page][si].items[ii] : { pill:'',color:'blue',name:'',note:'' };
+  let h = '<div class="modal-header"><h2>'+(isEdit?'編輯':'新增')+'補充品</h2><button class="modal-close" onclick="closeItemForm()">&times;</button></div>';
+  h += '<div class="modal-body">';
+  h += '<div class="frm-row"><label class="frm-label">名稱</label><input class="frm-input" id="frm-pill" value="'+escHtml(item.pill)+'" placeholder="例：魚油"></div>';
+  h += '<div class="frm-row"><label class="frm-label">顏色</label><div class="color-opts">';
+  COLORS.forEach(c => { h += '<div class="color-opt'+(c===item.color?' sel':'')+'" style="background:'+COLOR_CSS[c]+';" data-color="'+c+'" onclick="pickColor(this)"></div>'; });
+  h += '</div></div>';
+  h += '<div class="frm-row"><label class="frm-label">劑量說明</label><input class="frm-input" id="frm-name" value="'+escHtml(item.name)+'" placeholder="例：1 顆，隨餐"></div>';
+  h += '<div class="frm-row"><label class="frm-label">備註（選填）</label><input class="frm-input" id="frm-note" value="'+escHtml(item.note||'')+'" placeholder="例：空腹吃容易不舒服"></div>';
+  h += '<div class="frm-actions"><button class="frm-btn" onclick="closeItemForm()">取消</button>';
+  h += '<button class="frm-btn primary" onclick="saveItemForm(\''+page+'\','+si+','+(isEdit?ii:'null')+')">'+(isEdit?'儲存':'新增')+'</button></div>';
+  h += '</div>';
+  document.getElementById('item-modal').innerHTML = h;
+  document.getElementById('item-overlay').style.display='flex';
+}
+
+function closeItemForm() { document.getElementById('item-overlay').style.display='none'; }
+
+function pickColor(el) {
+  el.parentNode.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function saveItemForm(page,si,ii) {
+  const pill = document.getElementById('frm-pill').value.trim();
+  const name = document.getElementById('frm-name').value.trim();
+  const note = document.getElementById('frm-note').value.trim();
+  const colorEl = document.querySelector('.color-opt.sel');
+  const color = colorEl ? colorEl.dataset.color : 'blue';
+  if (!pill) { alert('請輸入名稱'); return; }
+  if (!name) { alert('請輸入劑量說明'); return; }
+  const c = getConfig();
+  if (ii!==null) {
+    const item = c[page][si].items[ii];
+    item.pill=pill; item.color=color; item.name=name; item.note=note;
+  } else {
+    c[page][si].items.push({ id:'i_'+uid(), pill, color, name, note });
+  }
+  saveConfig(c);
+  closeItemForm();
+  renderSettingsBody();
+  renderPage(page);
+  updateProgress();
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Export / Import ──
+function exportData() {
+  const data = {};
+  for (let i=0;i<localStorage.length;i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith('supp_')) data[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='supplement-data-'+todayStr()+'.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        let count = 0;
+        Object.entries(data).forEach(([k,v])=>{ if(k.startsWith('supp_')){localStorage.setItem(k,v);count++;} });
+        alert('已匯入 '+count+' 筆資料，頁面將重新載入。');
+        location.reload();
+      } catch(e) { alert('匯入失敗：檔案格式不正確'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetToDefaults() {
+  if (!confirm('確定要重設所有補充品設定為預設值？（打勾紀錄會保留）')) return;
+  localStorage.removeItem('supp_config');
+  renderSettingsBody();
+  renderPage('train'); renderPage('rest');
+  updateProgress();
+  alert('已重設為預設值');
+}
+
+// ══════════════════════════════════════
+// ── Clean up old storage (30 days) ──
+// ══════════════════════════════════════
+function cleanOldStorage() {
+  const today = new Date();
+  for (let i=0;i<localStorage.length;i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith('supp_checks_')) continue;
+    const ds = k.replace('supp_checks_','');
+    const d = new Date(ds);
+    if (isNaN(d.getTime())) continue;
+    if ((today-d)/(1000*60*60*24)>30) localStorage.removeItem(k);
+  }
+}
+
+// ══════════════════════════════════════
+// ── Service Worker ──
+// ══════════════════════════════════════
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
+}
+
+// ══════════════════════════════════════
+// ── Init ──
+// ══════════════════════════════════════
+migrateOldData();
+updateDate();
+initTheme();
+renderPage('train');
+renderPage('rest');
+autoSelectTab();
+updateProgress();
+updateStreak();
+cleanOldStorage();
+registerSW();
+initNotifications();
 </script>
 </body>
 </html>

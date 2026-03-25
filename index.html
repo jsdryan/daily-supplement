@@ -245,7 +245,8 @@
   .drag-ghost.visible { opacity: 0.92; transform: scale(1.04); }
   .drag-placeholder { transition: height 0.25s cubic-bezier(0.2,0,0,1), opacity 0.15s ease, margin 0.25s cubic-bezier(0.2,0,0,1); }
   .drag-placeholder.collapsing { opacity: 0; height: 0 !important; margin: 0; }
-  body.is-dragging { user-select: none; -webkit-user-select: none; }
+  body.is-dragging { user-select: none; -webkit-user-select: none; overflow: hidden; }
+  body.is-dragging .modal { overflow: hidden; }
   body.is-dragging .mg-section, body.is-dragging .mg-item { transition: transform 0.25s cubic-bezier(0.2,0,0,1), opacity 0.2s ease; }
 </style>
 </head>
@@ -846,6 +847,10 @@ let longPressTimer = null;
 const LONG_PRESS_MS = 400;
 const MOVE_THRESHOLD = 8;
 
+function preventTouchScroll(e) {
+  if (dragState && dragState.phase === 'dragging') e.preventDefault();
+}
+
 function initDrag() {
   const root = document.getElementById('settings-body');
   if (!root) return;
@@ -853,6 +858,9 @@ function initDrag() {
   root.addEventListener('pointermove', onPointerMove);
   root.addEventListener('pointerup', onPointerUp);
   root.addEventListener('pointercancel', onPointerUp);
+  // iOS Safari: pointerEvent.preventDefault() does NOT stop scrolling.
+  // Must intercept touchmove with { passive: false } to truly prevent scroll.
+  root.addEventListener('touchmove', preventTouchScroll, { passive: false });
 }
 
 function onPointerDown(e) {
@@ -895,6 +903,7 @@ function activateDrag(el, pointerId, startY) {
   el.style.opacity = '0';
 
   el.setPointerCapture(pointerId);
+  el.style.touchAction = 'none';
   document.body.classList.add('is-dragging');
   window.getSelection().removeAllRanges();
 
@@ -1001,6 +1010,7 @@ function onPointerUp(e) {
     el.classList.remove('drag-placeholder');
     el.style.height = '';
     el.style.opacity = '';
+    el.style.touchAction = '';
     document.body.classList.remove('is-dragging');
 
     if (fromIdx !== curIdx) {
@@ -1035,6 +1045,7 @@ function cancelDrag() {
     if (dragState.el) {
       dragState.el.classList.remove('drag-placeholder', 'drag-ready');
       dragState.el.style.height = '';
+      dragState.el.style.touchAction = '';
     }
   }
   dragState = null;

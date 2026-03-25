@@ -59,7 +59,7 @@
     --header-bg: #0A0A0A;
   }
 
-  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s, color 0.3s; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
   header { background: var(--header-bg); color: white; padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
   .header-row { display: flex; align-items: center; justify-content: space-between; }
@@ -1237,6 +1237,7 @@ updateStreak();
 cleanOldStorage();
 registerSW();
 initNotifications();
+document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
 </html>

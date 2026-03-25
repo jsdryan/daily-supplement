@@ -231,6 +231,22 @@
   .data-btn { padding: 11px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; background: var(--card); color: var(--text); font-family: 'Noto Sans TC', sans-serif; transition: background 0.15s; }
   .data-btn:active { background: var(--bg); }
   .data-btn.danger { border-color: var(--coral); color: var(--coral); }
+
+  /* ── Day Selector ── */
+  .day-selector { display: flex; gap: 6px; }
+  .day-chip { flex: 1; padding: 8px 0; text-align: center; font-size: 13px; font-weight: 600; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; background: var(--card); color: var(--text-3); transition: all 0.2s; font-family: 'Noto Sans TC', sans-serif; }
+  .day-chip:active { opacity: 0.7; }
+  .day-chip.sel { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+
+  /* ── Drag & Drop (long-press) ── */
+  .mg-section, .mg-item { transition: transform 0.25s cubic-bezier(0.2,0,0,1), opacity 0.2s ease, box-shadow 0.2s ease; }
+  .drag-ready { transform: scale(1.03); box-shadow: 0 4px 16px rgba(0,0,0,0.2); z-index: 10; position: relative; }
+  .drag-ghost { position: fixed; z-index: 300; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.25); border-radius: var(--radius-sm); user-select: none; transition: transform 0.15s ease, opacity 0.15s ease; opacity: 0; transform: scale(0.97); }
+  .drag-ghost.visible { opacity: 0.92; transform: scale(1.04); }
+  .drag-placeholder { transition: height 0.25s cubic-bezier(0.2,0,0,1), opacity 0.15s ease, margin 0.25s cubic-bezier(0.2,0,0,1); }
+  .drag-placeholder.collapsing { opacity: 0; height: 0 !important; margin: 0; }
+  body.is-dragging { user-select: none; -webkit-user-select: none; }
+  body.is-dragging .mg-section, body.is-dragging .mg-item { transition: transform 0.25s cubic-bezier(0.2,0,0,1), opacity 0.2s ease; }
 </style>
 </head>
 <body>
@@ -337,7 +353,7 @@ function defaultConfig() {
       { icon:'🏋️', text:'<strong>訓練前乳清</strong>在晚餐後 30 分喝，訓練後 30 分內再補一杯' }
     ],
     notes: { train:'喝水目標 3,000ml 以上 — 肌酸和瓜胺酸需要足夠水分才能發揮效果', rest:'休息日不需要 L-瓜胺酸和 L-Arginine，其餘全部照常。喝水 2,500ml' },
-    dayLabels: { train:'週一 二 三 五 六', rest:'週四 日' }
+    trainingDays: [1, 2, 3, 5, 6]
   };
 }
 
@@ -349,17 +365,27 @@ function formatDate(d) {
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function isTrainingDay(d) {
-  return [1,2,3,5,6].includes((d||new Date()).getDay());
+  return getConfig().trainingDays.includes((d||new Date()).getDay());
 }
 function pageForDay(d) { return isTrainingDay(d) ? 'train' : 'rest'; }
 function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+function getDayLabels(config) {
+  const names = ['日','一','二','三','四','五','六'];
+  const td = config.trainingDays || [1,2,3,5,6];
+  const trainNames = names.filter((_,i)=>td.includes(i)).map((n,i)=>i===0?'週'+n:n);
+  const restNames  = names.filter((_,i)=>!td.includes(i)).map((n,i)=>i===0?'週'+n:n);
+  return { train: trainNames.join(' '), rest: restNames.join(' ') };
+}
 
 // ══════════════════════════════════════
 // ── Config Storage ──
 // ══════════════════════════════════════
 function getConfig() {
   const raw = localStorage.getItem('supp_config');
-  return raw ? JSON.parse(raw) : defaultConfig();
+  const c = raw ? JSON.parse(raw) : defaultConfig();
+  if (!c.trainingDays) c.trainingDays = [1, 2, 3, 5, 6];
+  return c;
 }
 function saveConfig(c) { localStorage.setItem('supp_config', JSON.stringify(c)); }
 
@@ -443,7 +469,8 @@ function renderPage(pageId) {
   const checks = getChecks(todayStr());
   const checkedIds = checks[pageId] || [];
   let h = '';
-  h += '<div class="page-label">'+config.dayLabels[pageId]+'</div>';
+  const dayLabels = getDayLabels(config);
+  h += '<div class="page-label">'+dayLabels[pageId]+'</div>';
   h += '<div id="'+pageId+'-streak" class="streak-bar" style="display:none;"></div>';
   h += '<div id="'+pageId+'-done" class="done-banner">今日補充劑全部完成 ✓</div>';
   sections.forEach(sec => {
@@ -756,6 +783,19 @@ function renderSettingsBody() {
   }
   h += '</div>';
 
+  // ── Training Days ──
+  h += '<div class="stg-section"><div class="stg-title">&#128197; 訓練日設定</div>';
+  h += '<div class="day-selector">';
+  const dayNames = ['日','一','二','三','四','五','六'];
+  const td = config.trainingDays || [1,2,3,5,6];
+  // Display Mon–Sun order: 1,2,3,4,5,6,0
+  [1,2,3,4,5,6,0].forEach(i => {
+    h += '<button class="day-chip'+(td.includes(i)?' sel':'')+'" onclick="toggleTrainingDay('+i+')">'+dayNames[i]+'</button>';
+  });
+  h += '</div>';
+  h += '<div class="stg-note">點擊切換訓練日（藍色）與休息日</div>';
+  h += '</div>';
+
   // ── Supplement Management ──
   h += '<div class="stg-section"><div class="stg-title">&#128138; 補充品管理</div>';
   h += '<div class="stg-tabs">';
@@ -775,18 +815,20 @@ function renderSettingsBody() {
   h += '</div></div>';
 
   document.getElementById('settings-body').innerHTML = h;
+  initDrag();
 }
 
 function buildManageSections(page, config) {
   const sections = config[page];
   let h = '';
   sections.forEach((sec,si) => {
-    h += '<div class="mg-section">';
+    h += '<div class="mg-section" data-drag-type="section" data-page="'+page+'" data-si="'+si+'">';
     h += '<div class="mg-section-hd"><div class="dot" style="background:'+sec.dotColor+';"></div>';
     h += '<span class="mg-section-title">'+sec.title+'</span>';
     h += '<button class="mg-btn danger" onclick="deleteSection(\''+page+'\','+si+')" title="刪除">&#10005;</button></div>';
     sec.items.forEach((item,ii) => {
-      h += '<div class="mg-item"><span class="pill pill-'+item.color+'">'+item.pill+'</span>';
+      h += '<div class="mg-item" data-drag-type="item" data-page="'+page+'" data-si="'+si+'" data-ii="'+ii+'">';
+      h += '<span class="pill pill-'+item.color+'">'+item.pill+'</span>';
       h += '<span class="mg-item-info">'+item.name+'</span>';
       h += '<button class="mg-btn" onclick="editItem(\''+page+'\','+si+','+ii+')">編輯</button> ';
       h += '<button class="mg-btn danger" onclick="deleteItem(\''+page+'\','+si+','+ii+')">&#10005;</button>';
@@ -796,6 +838,223 @@ function buildManageSections(page, config) {
     h += '</div>';
   });
   return h;
+}
+
+// ── Drag & Drop Engine (long-press + ghost + live reorder) ──
+let dragState = null;
+let longPressTimer = null;
+const LONG_PRESS_MS = 400;
+const MOVE_THRESHOLD = 8;
+
+function initDrag() {
+  const root = document.getElementById('settings-body');
+  if (!root) return;
+  root.addEventListener('pointerdown', onPointerDown);
+  root.addEventListener('pointermove', onPointerMove);
+  root.addEventListener('pointerup', onPointerUp);
+  root.addEventListener('pointercancel', onPointerUp);
+}
+
+function onPointerDown(e) {
+  if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
+  const item = e.target.closest('.mg-item[data-drag-type]');
+  const section = e.target.closest('.mg-section[data-drag-type]');
+  if (!item && !section) return;
+  const el = item || section;
+
+  clearTimeout(longPressTimer);
+  dragState = { phase: 'pending', el, startX: e.clientX, startY: e.clientY, pointerId: e.pointerId };
+  longPressTimer = setTimeout(() => {
+    if (!dragState || dragState.phase !== 'pending') return;
+    if (navigator.vibrate) navigator.vibrate(30);
+    activateDrag(el, dragState.pointerId, dragState.startY);
+  }, LONG_PRESS_MS);
+}
+
+function activateDrag(el, pointerId, startY) {
+  const type = el.dataset.dragType;
+  const page = el.dataset.page;
+  const origSi = Number(el.dataset.si);
+  const origIi = el.dataset.ii !== undefined ? Number(el.dataset.ii) : null;
+  const rect = el.getBoundingClientRect();
+
+  // Ghost: floating clone that follows finger (fade in)
+  const ghost = el.cloneNode(true);
+  ghost.classList.add('drag-ghost');
+  ghost.style.width = rect.width + 'px';
+  ghost.style.left = rect.left + 'px';
+  ghost.style.top = rect.top + 'px';
+  document.body.appendChild(ghost);
+  // Trigger reflow, then animate in
+  ghost.offsetHeight;
+  ghost.classList.add('visible');
+
+  // Placeholder: keep space, fade out smoothly
+  el.classList.add('drag-placeholder');
+  el.style.height = rect.height + 'px';
+  el.style.opacity = '0';
+
+  el.setPointerCapture(pointerId);
+  document.body.classList.add('is-dragging');
+  window.getSelection().removeAllRanges();
+
+  dragState = {
+    phase: 'dragging', type, page,
+    origSi, origIi,       // original config indices (never change)
+    curIdx: type === 'section' ? origSi : origIi, // tracks visual position
+    el, ghost, pointerId,
+    offsetY: startY - rect.top
+  };
+}
+
+function getSiblings(type, page, si) {
+  const root = document.getElementById('settings-body');
+  if (type === 'section') {
+    return Array.from(root.querySelectorAll('.mg-section[data-page="'+page+'"]'));
+  }
+  return Array.from(root.querySelectorAll('.mg-item[data-page="'+page+'"][data-si="'+si+'"]'));
+}
+
+function onPointerMove(e) {
+  if (!dragState) return;
+
+  if (dragState.phase === 'pending') {
+    const dx = e.clientX - dragState.startX, dy = e.clientY - dragState.startY;
+    if (Math.abs(dx) > MOVE_THRESHOLD || Math.abs(dy) > MOVE_THRESHOLD) cancelDrag();
+    return;
+  }
+
+  if (dragState.phase !== 'dragging') return;
+  e.preventDefault();
+
+  const { type, page, origSi, el, ghost, offsetY } = dragState;
+  // Move ghost with finger
+  ghost.style.top = (e.clientY - offsetY) + 'px';
+
+  // Get current siblings in DOM order
+  const siblings = getSiblings(type, page, origSi);
+  const elVisualIdx = siblings.indexOf(el);
+
+  // Find which sibling the finger is over (by midpoint)
+  let swapTarget = -1;
+  for (let i = 0; i < siblings.length; i++) {
+    if (i === elVisualIdx) continue;
+    const r = siblings[i].getBoundingClientRect();
+    const mid = r.top + r.height / 2;
+    // Moving up: finger above sibling midpoint, sibling is above us
+    if (i < elVisualIdx && e.clientY < mid) { swapTarget = i; break; }
+    // Moving down: finger below sibling midpoint, sibling is below us
+    if (i > elVisualIdx && e.clientY > mid) { swapTarget = i; }
+  }
+
+  // Live DOM swap with FLIP animation — siblings slide smoothly
+  if (swapTarget !== -1 && swapTarget !== elVisualIdx) {
+    // FLIP: First — record positions before swap
+    const rects = new Map();
+    siblings.forEach(sib => { if (sib !== el) rects.set(sib, sib.getBoundingClientRect()); });
+
+    // Perform DOM swap
+    const parent = el.parentNode;
+    if (swapTarget < elVisualIdx) {
+      parent.insertBefore(el, siblings[swapTarget]);
+    } else {
+      const after = siblings[swapTarget].nextSibling;
+      parent.insertBefore(el, after);
+    }
+
+    // FLIP: Last + Invert + Play — animate displaced siblings
+    rects.forEach((oldRect, sib) => {
+      const newRect = sib.getBoundingClientRect();
+      const dy = oldRect.top - newRect.top;
+      if (Math.abs(dy) > 0.5) {
+        sib.style.transition = 'none';
+        sib.style.transform = 'translateY(' + dy + 'px)';
+        sib.offsetHeight; // force reflow
+        sib.style.transition = 'transform 0.25s cubic-bezier(0.2,0,0,1)';
+        sib.style.transform = '';
+      }
+    });
+
+    dragState.curIdx = swapTarget;
+  }
+}
+
+function onPointerUp(e) {
+  if (!dragState) { clearTimeout(longPressTimer); return; }
+  if (dragState.phase !== 'dragging') { cancelDrag(); return; }
+
+  const { type, page, origSi, origIi, curIdx, el, ghost } = dragState;
+  const fromIdx = type === 'section' ? origSi : origIi;
+
+  // Animate ghost back to placeholder position
+  const placeholderRect = el.getBoundingClientRect();
+  ghost.style.transition = 'all 0.2s cubic-bezier(0.2,0,0,1)';
+  ghost.style.top = placeholderRect.top + 'px';
+  ghost.style.left = placeholderRect.left + 'px';
+  ghost.style.transform = 'scale(1)';
+  ghost.style.opacity = '0.5';
+  ghost.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+
+  // After animation, clean up and apply config
+  const cleanup = () => {
+    if (ghost && ghost.parentNode) ghost.remove();
+    el.classList.remove('drag-placeholder');
+    el.style.height = '';
+    el.style.opacity = '';
+    document.body.classList.remove('is-dragging');
+
+    if (fromIdx !== curIdx) {
+      const c = getConfig();
+      if (type === 'section') {
+        const [moved] = c[page].splice(fromIdx, 1);
+        c[page].splice(curIdx, 0, moved);
+      } else {
+        const items = c[page][origSi].items;
+        const [moved] = items.splice(fromIdx, 1);
+        items.splice(curIdx, 0, moved);
+      }
+      saveConfig(c);
+    }
+
+    renderSettingsBody();
+    renderPage('train'); renderPage('rest');
+    updateProgress();
+    dragState = null;
+  };
+
+  ghost.addEventListener('transitionend', cleanup, { once: true });
+  // Fallback in case transitionend doesn't fire
+  setTimeout(cleanup, 250);
+}
+
+function cancelDrag() {
+  clearTimeout(longPressTimer);
+  document.body.classList.remove('is-dragging');
+  if (dragState) {
+    if (dragState.ghost && dragState.ghost.parentNode) dragState.ghost.remove();
+    if (dragState.el) {
+      dragState.el.classList.remove('drag-placeholder', 'drag-ready');
+      dragState.el.style.height = '';
+    }
+  }
+  dragState = null;
+}
+
+// ── Training Day Toggle ──
+function toggleTrainingDay(dayNum) {
+  const c = getConfig();
+  const idx = c.trainingDays.indexOf(dayNum);
+  if (idx > -1) {
+    if (c.trainingDays.length <= 1) { alert('至少要保留一個訓練日'); return; }
+    c.trainingDays.splice(idx, 1);
+  } else {
+    c.trainingDays.push(dayNum);
+    c.trainingDays.sort((a,b)=>a-b);
+  }
+  saveConfig(c);
+  renderSettingsBody();
+  renderPage('train'); renderPage('rest');
+  updateDate(); autoSelectTab(); updateProgress();
 }
 
 // ── Notification Helpers ──
